@@ -128,6 +128,14 @@ def card_obj(d, name_en, kind, meta):
         'jp_id': d.get('jp_id') or 0,
     }
 
+def archive_image_url(filename):
+    redirect = 'https://archives.bulbagarden.net/wiki/Special:Redirect/file/' + filename
+    try:
+        return urlopen(Request(redirect, headers={'User-Agent':'AllARCollection/1.0'}), timeout=30).geturl()
+    except (HTTPError, URLError) as exc:
+        print(f'WARN archive image redirect unavailable for {filename}: {exc}')
+        return redirect
+
 def main():
     names, promo_keys, source_meta = fetch_bulba_rows()
     tmp = Path(tempfile.mkdtemp(prefix='allar-upstream-'))
@@ -154,7 +162,7 @@ def main():
                         'set_name': '30th CELEBRATION Card Set', 'number': number,
                         'number_display': f'{number}/M-P', 'name': names.get(key, number),
                         'name_ja': '', 'rarity': 'AR Promo', 'kind': 'AR Promo',
-                        'image': 'https://archives.bulbagarden.net/wiki/Special:Redirect/file/' + M_PROMO_IMAGE_FILES[number],
+                        'image': archive_image_url(M_PROMO_IMAGE_FILES[number]),
                         'source_url': BULBA_URL, 'jp_id': 1000000 + int(number),
                     })
                     continue
