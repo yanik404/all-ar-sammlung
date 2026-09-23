@@ -142,7 +142,7 @@ def main():
             if obj['id'] not in seen:
                 cards.append(obj); seen.add(obj['id'])
         # Registration order is a reliable fallback until exact per-card promo dates are enriched.
-        cards.sort(key=lambda c: (int(c.get('jp_id') or 0), c['set_code'], int(c['number']) if str(c['number']).isdigit() else 9999))
+        cards.sort(key=lambda c: (c['kind'] == 'AR Promo', int(c.get('jp_id') or 0), c['set_code'], int(c['number']) if str(c['number']).isdigit() else 9999))
         OUT.parent.mkdir(parents=True, exist_ok=True)
         OUT.write_text(json.dumps({'generated_from': {'official_jp':'type-null/PTCG-database (pokemon-card.com)','art_rare_reference':BULBA_URL}, 'count': len(cards), 'cards': cards}, ensure_ascii=False, indent=2), encoding='utf-8')
         print(f'Wrote {len(cards)} verified AR/AR-promo cards -> {OUT}')
