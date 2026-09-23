@@ -21,6 +21,17 @@ M_PROMO_IMAGE_FILES = {
     '122':'GrookeyMEPPromo52.jpg','123':'ScorbunnyMEPPromo53.jpg','124':'SobbleMEPPromo54.jpg',
     '125':'SprigatitoMEPPromo61.jpg','126':'FuecocoMEPPromo62.jpg','127':'QuaxlyMEPPromo63.jpg',
 }
+M_PROMO_IMAGE_URLS = {
+    '101':'https://archives.bulbagarden.net/media/upload/3/32/BulbasaurMEPPromo37.jpg', '102':'https://archives.bulbagarden.net/media/upload/b/b3/CharmanderMEPPromo38.jpg', '103':'https://archives.bulbagarden.net/media/upload/e/e9/SquirtleMEPPromo39.jpg',
+    '104':'https://archives.bulbagarden.net/media/upload/4/41/ChikoritaMEPPromo46.jpg', '105':'https://archives.bulbagarden.net/media/upload/f/fb/CyndaquilMEPPromo47.jpg', '106':'https://archives.bulbagarden.net/media/upload/8/8c/TotodileMEPPromo48.jpg',
+    '107':'https://archives.bulbagarden.net/media/upload/3/38/TreeckoMEPPromo55.jpg', '108':'https://archives.bulbagarden.net/media/upload/a/a8/TorchicMEPPromo56.jpg', '109':'https://archives.bulbagarden.net/media/upload/6/63/MudkipMEPPromo57.jpg',
+    '110':'https://archives.bulbagarden.net/media/upload/b/ba/TurtwigMEPPromo40.jpg', '111':'https://archives.bulbagarden.net/media/upload/d/de/ChimcharMEPPromo41.jpg', '112':'https://archives.bulbagarden.net/media/upload/5/5f/PiplupMEPPromo42.jpg',
+    '113':'https://archives.bulbagarden.net/media/upload/2/2f/SnivyMEPPromo49.jpg', '114':'https://archives.bulbagarden.net/media/upload/c/c2/TepigMEPPromo50.jpg', '115':'https://archives.bulbagarden.net/media/upload/0/02/OshawottMEPPromo51.jpg',
+    '116':'https://archives.bulbagarden.net/media/upload/b/bb/ChespinMEPPromo58.jpg', '117':'https://archives.bulbagarden.net/media/upload/5/5b/FennekinMEPPromo59.jpg', '118':'https://archives.bulbagarden.net/media/upload/5/50/FroakieMEPPromo60.jpg',
+    '119':'https://archives.bulbagarden.net/media/upload/5/5b/RowletMEPPromo43.jpg', '120':'https://archives.bulbagarden.net/media/upload/9/92/LittenMEPPromo44.jpg', '121':'https://archives.bulbagarden.net/media/upload/9/9c/PopplioMEPPromo45.jpg',
+    '122':'https://archives.bulbagarden.net/media/upload/4/48/GrookeyMEPPromo52.jpg', '123':'https://archives.bulbagarden.net/media/upload/e/e5/ScorbunnyMEPPromo53.jpg', '124':'https://archives.bulbagarden.net/media/upload/3/37/SobbleMEPPromo54.jpg',
+    '125':'https://archives.bulbagarden.net/media/upload/d/d6/SprigatitoMEPPromo61.jpg', '126':'https://archives.bulbagarden.net/media/upload/8/81/FuecocoMEPPromo62.jpg', '127':'https://archives.bulbagarden.net/media/upload/d/d9/QuaxlyMEPPromo63.jpg',
+}
 
 # Bulbapedia Japanese expansion label -> official Japanese set code used by pokemon-card.com
 SET_MAP = {
@@ -162,7 +173,7 @@ def main():
                         'set_name': '30th CELEBRATION Card Set', 'number': number,
                         'number_display': f'{number}/M-P', 'name': names.get(key, number),
                         'name_ja': '', 'rarity': 'AR Promo', 'kind': 'AR Promo',
-                        'image': archive_image_url(M_PROMO_IMAGE_FILES[number]),
+                        'image': M_PROMO_IMAGE_URLS[number],
                         'source_url': BULBA_URL, 'jp_id': 1000000 + int(number),
                     })
                     continue
