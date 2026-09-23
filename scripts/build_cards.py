@@ -123,6 +123,8 @@ def main():
     try:
         clone_upstream(tmp)
         by_key, ar_records = load_records(tmp)
+        mp_numbers = {number for set_code, number in promo_keys if set_code == 'M-P'}
+        print('DEBUG M-P source codes:', {set_code: sum(1 for code, number in by_key if code == set_code and number in mp_numbers) for set_code, _ in by_key if any(code == set_code and number in mp_numbers for code, number in by_key)})
         cards = []
         seen = set()
         # True official Japanese AR rarity only.
