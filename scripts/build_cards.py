@@ -10,6 +10,17 @@ BULBA_URL = 'https://bulbapedia.bulbagarden.net/wiki/Illustration_rare_card_(TCG
 BULBA_API_URL = 'https://bulbapedia.bulbagarden.net/w/api.php?action=parse&page=Illustration_rare_card_(TCG)&prop=text&format=json'
 OUT = Path(__file__).resolve().parents[1] / 'data' / 'cards.json'
 REFERENCE_CACHE = Path(__file__).resolve().parents[1] / 'data' / 'art_rare_reference.json'
+M_PROMO_IMAGE_FILES = {
+    '101':'BulbasaurMEPPromo37.jpg','102':'CharmanderMEPPromo38.jpg','103':'SquirtleMEPPromo39.jpg',
+    '104':'ChikoritaMEPPromo46.jpg','105':'CyndaquilMEPPromo47.jpg','106':'TotodileMEPPromo48.jpg',
+    '107':'TreeckoMEPPromo55.jpg','108':'TorchicMEPPromo56.jpg','109':'MudkipMEPPromo57.jpg',
+    '110':'TurtwigMEPPromo40.jpg','111':'ChimcharMEPPromo41.jpg','112':'PiplupMEPPromo42.jpg',
+    '113':'SnivyMEPPromo49.jpg','114':'TepigMEPPromo50.jpg','115':'OshawottMEPPromo51.jpg',
+    '116':'ChespinMEPPromo58.jpg','117':'FennekinMEPPromo59.jpg','118':'FroakieMEPPromo60.jpg',
+    '119':'RowletMEPPromo43.jpg','120':'LittenMEPPromo44.jpg','121':'PopplioMEPPromo45.jpg',
+    '122':'GrookeyMEPPromo52.jpg','123':'ScorbunnyMEPPromo53.jpg','124':'SobbleMEPPromo54.jpg',
+    '125':'SprigatitoMEPPromo61.jpg','126':'FuecocoMEPPromo62.jpg','127':'QuaxlyMEPPromo63.jpg',
+}
 
 # Bulbapedia Japanese expansion label -> official Japanese set code used by pokemon-card.com
 SET_MAP = {
@@ -136,6 +147,17 @@ def main():
         for key in sorted(promo_keys):
             d = by_key.get(key)
             if not d:
+                if key[0] == 'M-P' and key[1] in M_PROMO_IMAGE_FILES:
+                    number = key[1]
+                    cards.append({
+                        'id': f'promo:M-P-{number}', 'set_code': 'M-P',
+                        'set_name': '30th CELEBRATION Card Set', 'number': number,
+                        'number_display': f'{number}/M-P', 'name': names.get(key, number),
+                        'name_ja': '', 'rarity': 'AR Promo', 'kind': 'AR Promo',
+                        'image': 'https://archives.bulbagarden.net/wiki/Special:Redirect/file/' + M_PROMO_IMAGE_FILES[number],
+                        'source_url': BULBA_URL, 'jp_id': 1000000 + int(number),
+                    })
+                    continue
                 print('WARN promo not found upstream:', key)
                 continue
             obj = card_obj(d, names.get(key), 'AR Promo', source_meta.get(key, {}))
