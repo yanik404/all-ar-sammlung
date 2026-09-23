@@ -1,0 +1,140 @@
+#!/usr/bin/env python3
+import json, re, subprocess, tempfile, shutil
+from pathlib import Path
+from urllib.request import Request, urlopen
+from bs4 import BeautifulSoup
+
+UPSTREAM = 'https://github.com/type-null/PTCG-database.git'
+BULBA_URL = 'https://bulbapedia.bulbagarden.net/wiki/Art_Rare'
+OUT = Path(__file__).resolve().parents[1] / 'data' / 'cards.json'
+
+# Bulbapedia Japanese expansion label -> official Japanese set code used by pokemon-card.com
+SET_MAP = {
+    'VSTAR Universe':'S12a','Scarlet ex':'SV1S','Violet ex':'SV1V','Triplet Beat':'SV1a',
+    'Snow Hazard':'SV2P','Clay Burst':'SV2D','Pokémon Card 151':'SV2a','Ruler of the Black Flame':'SV3',
+    'Raging Surf':'SV3a','Ancient Roar':'SV4K','Future Flash':'SV4M','Shiny Treasure ex':'SV4a',
+    'Wild Force':'SV5K','Cyber Judge':'SV5M','Crimson Haze':'SV5a','Transformation Mask':'SV6',
+    'Night Wanderer':'SV6a','Stellar Miracle':'SV7','Paradise Dragona':'SV7a','Super Electric Breaker':'SV8',
+    'Terastal Festival ex':'SV8a','Battle Partners':'SV9','Hot Wind Arena':'SV9a','Glory of the Rocket Gang':'SV10',
+    'Black Bolt':'SV11B','White Flare':'SV11W','Mega Brave':'M1L','Mega Symphonia':'M1S',
+    'Inferno X':'M2','MEGA Dream ex':'M2a','Mega Dream ex':'M2a','Nihil Zero':'M3','Ninja Spinner':'M4',
+    'Abyss Eye':'M5','Storm Emeralda':'M6',
+    'SV-P Promotional cards':'SV-P','M-P Promotional cards':'M-P',
+}
+
+def norm(s):
+    return re.sub(r'\s+',' ',s.replace('\xa0',' ')).strip()
+
+def fetch_bulba_rows():
+    req = Request(BULBA_URL, headers={'User-Agent':'AllARCollection/1.0'})
+    html = urlopen(req, timeout=60).read()
+    soup = BeautifulSoup(html, 'html.parser')
+    name_map = {}
+    promo_keys = set()
+    source_meta = {}
+    for table in soup.find_all('table'):
+        # Skip Trainer Gallery / CHR tables completely.
+        h = table.find_previous(['h2','h3'])
+        heading = norm(h.get_text(' ', strip=True)) if h else ''
+        if 'Trainer Gallery' in heading:
+            continue
+        for tr in table.find_all('tr'):
+            cells = tr.find_all(['td','th'])
+            if len(cells) < 7:
+                continue
+            vals = [norm(c.get_text(' ', strip=True)) for c in cells]
+            card_name = vals[0]
+            jp_exp = vals[-3]
+            jp_num = vals[-1]
+            if not card_name or not jp_exp or not jp_num:
+                continue
+            # numbers: 079/078, 193/SV-P, 105/M-P, etc.
+            m = re.search(r'(\d{1,3})\s*/\s*([A-Za-z0-9-]+)', jp_num)
+            if not m:
+                continue
+            numerator = str(int(m.group(1))).zfill(3)
+            set_code = SET_MAP.get(jp_exp)
+            if not set_code:
+                continue
+            key = (set_code, numerator)
+            name_map[key] = card_name
+            source_meta[key] = {'bulbapedia_expansion': jp_exp, 'bulbapedia_number': jp_num}
+            if set_code.endswith('-P'):
+                promo_keys.add(key)
+    return name_map, promo_keys, source_meta
+
+def clone_upstream(dest: Path):
+    subprocess.run(['git','clone','--depth','1','--filter=blob:none','--sparse',UPSTREAM,str(dest)], check=True)
+    subprocess.run(['git','-C',str(dest),'sparse-checkout','set','data_jp'], check=True)
+
+def load_records(root: Path):
+    by_key = {}
+    ar = []
+    for p in (root/'data_jp').glob('*/*.json'):
+        try:
+            d = json.loads(p.read_text(encoding='utf-8'))
+        except Exception:
+            continue
+        set_code = str(d.get('set_name') or '')
+        num = str(d.get('number') or '')
+        if not set_code or not num:
+            continue
+        num3 = str(int(num)).zfill(3) if num.isdigit() else num
+        by_key[(set_code,num3)] = d
+        if d.get('rarity') == 'rare_ar':
+            ar.append(d)
+    return by_key, ar
+
+def card_obj(d, name_en, kind, meta):
+    num = str(d.get('number') or '')
+    total = str(d.get('set_total') or '')
+    display_num = f'{num}/{total}' if total and total != d.get('set_name') else (f'{num}/{total}' if total else num)
+    return {
+        'id': d.get('print_key') or f"asia:{d.get('set_name')}-{num}",
+        'set_code': d.get('set_name'),
+        'set_name': meta.get('bulbapedia_expansion') or d.get('set_name'),
+        'number': num,
+        'number_display': meta.get('bulbapedia_number') or display_num,
+        'name': name_en or d.get('name'),
+        'name_ja': d.get('name'),
+        'rarity': 'AR' if kind == 'AR' else 'AR Promo',
+        'kind': kind,
+        'image': d.get('img'),
+        'source_url': d.get('url'),
+        'jp_id': d.get('jp_id') or 0,
+    }
+
+def main():
+    names, promo_keys, source_meta = fetch_bulba_rows()
+    tmp = Path(tempfile.mkdtemp(prefix='allar-upstream-'))
+    try:
+        clone_upstream(tmp)
+        by_key, ar_records = load_records(tmp)
+        cards = []
+        seen = set()
+        # True official Japanese AR rarity only.
+        for d in ar_records:
+            num = str(d.get('number') or '')
+            num3 = str(int(num)).zfill(3) if num.isdigit() else num
+            key = (str(d.get('set_name') or ''), num3)
+            obj = card_obj(d, names.get(key), 'AR', source_meta.get(key, {}))
+            cards.append(obj); seen.add(obj['id'])
+        # Promo cards explicitly associated with Illustration/Art Rare on Bulbapedia.
+        for key in sorted(promo_keys):
+            d = by_key.get(key)
+            if not d:
+                print('WARN promo not found upstream:', key)
+                continue
+            obj = card_obj(d, names.get(key), 'AR Promo', source_meta.get(key, {}))
+            if obj['id'] not in seen:
+                cards.append(obj); seen.add(obj['id'])
+        # Registration order is a reliable fallback until exact per-card promo dates are enriched.
+        cards.sort(key=lambda c: (int(c.get('jp_id') or 0), c['set_code'], int(c['number']) if str(c['number']).isdigit() else 9999))
+        OUT.parent.mkdir(parents=True, exist_ok=True)
+        OUT.write_text(json.dumps({'generated_from': {'official_jp':'type-null/PTCG-database (pokemon-card.com)','art_rare_reference':BULBA_URL}, 'count': len(cards), 'cards': cards}, ensure_ascii=False, indent=2), encoding='utf-8')
+        print(f'Wrote {len(cards)} verified AR/AR-promo cards -> {OUT}')
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+if __name__ == '__main__':
+    main()
