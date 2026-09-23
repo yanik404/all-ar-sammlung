@@ -6,7 +6,8 @@ from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 
 UPSTREAM = 'https://github.com/type-null/PTCG-database.git'
-BULBA_URL = 'https://bulbapedia.bulbagarden.net/wiki/Art_Rare'
+BULBA_URL = 'https://bulbapedia.bulbagarden.net/wiki/Illustration_rare_card_(TCG)'
+BULBA_API_URL = 'https://bulbapedia.bulbagarden.net/w/api.php?action=parse&page=Illustration_rare_card_(TCG)&prop=text&format=json'
 OUT = Path(__file__).resolve().parents[1] / 'data' / 'cards.json'
 
 # Bulbapedia Japanese expansion label -> official Japanese set code used by pokemon-card.com
@@ -27,9 +28,10 @@ def norm(s):
     return re.sub(r'\s+',' ',s.replace('\xa0',' ')).strip()
 
 def fetch_bulba_rows():
-    req = Request(BULBA_URL, headers={'User-Agent':'Mozilla/5.0 (compatible; AllARCollection/1.0; +https://github.com/yanik404/all-ar-sammlung)'})
+    req = Request(BULBA_API_URL, headers={'User-Agent':'Mozilla/5.0 (compatible; AllARCollection/1.0; +https://github.com/yanik404/all-ar-sammlung)'})
     try:
-        html = urlopen(req, timeout=60).read()
+        payload = json.loads(urlopen(req, timeout=60).read())
+        html = payload['parse']['text']['*'].encode('utf-8')
     except (HTTPError, URLError) as exc:
         # The collection stays correct when this optional cross-reference is
         # temporarily unavailable: official Japanese `rare_ar` records remain
