@@ -16,4 +16,5 @@ function exportBackup(){const b=new Blob([JSON.stringify(states,null,2)],{type:'
 importFile.onchange=async e=>{try{states=JSON.parse(await e.target.files[0].text());save();render();alert('Backup importiert')}catch{alert('Ungültiges Backup')}};
 document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));b.classList.add('active');filter=b.dataset.filter;render()});q.oninput=render;navCollection.onclick=()=>show('collection');navBinder.onclick=()=>show('binder');navBackup.onclick=()=>show('backup');
 const cardsEl=document.getElementById('cards');fetch('data/cards.json').then(r=>r.json()).then(d=>{cards=d.cards||[];if(!cards.length){notice.hidden=false;notice.textContent='Kartendaten sind noch nicht gebaut. Starte den GitHub-Workflow „Update verified AR data“.'}render()}).catch(e=>{notice.hidden=false;notice.textContent='Kartendaten konnten nicht geladen werden.'});if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
+navBinder.textContent='Binder';
 </script></body></html>
