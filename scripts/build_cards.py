@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json, re, subprocess, tempfile, shutil
 from pathlib import Path
+from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 
@@ -26,8 +27,15 @@ def norm(s):
     return re.sub(r'\s+',' ',s.replace('\xa0',' ')).strip()
 
 def fetch_bulba_rows():
-    req = Request(BULBA_URL, headers={'User-Agent':'AllARCollection/1.0'})
-    html = urlopen(req, timeout=60).read()
+    req = Request(BULBA_URL, headers={'User-Agent':'Mozilla/5.0 (compatible; AllARCollection/1.0; +https://github.com/yanik404/all-ar-sammlung)'})
+    try:
+        html = urlopen(req, timeout=60).read()
+    except (HTTPError, URLError) as exc:
+        # The collection stays correct when this optional cross-reference is
+        # temporarily unavailable: official Japanese `rare_ar` records remain
+        # included, while unverified promos are deliberately omitted.
+        print(f'WARN AR-promo reference unavailable; omitting promos: {exc}')
+        return {}, set(), {}
     soup = BeautifulSoup(html, 'html.parser')
     name_map = {}
     promo_keys = set()
