@@ -9,6 +9,7 @@ UPSTREAM = 'https://github.com/type-null/PTCG-database.git'
 BULBA_URL = 'https://bulbapedia.bulbagarden.net/wiki/Illustration_rare_card_(TCG)'
 BULBA_API_URL = 'https://bulbapedia.bulbagarden.net/w/api.php?action=parse&page=Illustration_rare_card_(TCG)&prop=text&format=json'
 OUT = Path(__file__).resolve().parents[1] / 'data' / 'cards.json'
+REFERENCE_CACHE = Path(__file__).resolve().parents[1] / 'data' / 'art_rare_reference.json'
 
 # Bulbapedia Japanese expansion label -> official Japanese set code used by pokemon-card.com
 SET_MAP = {
@@ -33,11 +34,13 @@ def fetch_bulba_rows():
         payload = json.loads(urlopen(req, timeout=60).read())
         html = payload['parse']['text']['*'].encode('utf-8')
     except (HTTPError, URLError) as exc:
-        # The collection stays correct when this optional cross-reference is
-        # temporarily unavailable: official Japanese `rare_ar` records remain
-        # included, while unverified promos are deliberately omitted.
-        print(f'WARN AR-promo reference unavailable; omitting promos: {exc}')
-        return {}, set(), {}
+        # GitHub-hosted runners can be blocked by Bulbapedia. The checked-in
+        # reference snapshot preserves English names and only verified promos.
+        cached = json.loads(REFERENCE_CACHE.read_text(encoding='utf-8'))
+        name_map = {tuple(key.split('|', 1)): value for key, value in cached['names'].items()}
+        promo_keys = {tuple(key.split('|', 1)) for key in cached['promo_keys']}
+        print(f'WARN live Art Rare reference unavailable; using verified snapshot: {exc}')
+        return name_map, promo_keys, {}
     soup = BeautifulSoup(html, 'html.parser')
     name_map = {}
     promo_keys = set()
@@ -120,7 +123,6 @@ def main():
     try:
         clone_upstream(tmp)
         by_key, ar_records = load_records(tmp)
-        print('DEBUG English-name matches:', sum(1 for d in ar_records if (str(d.get('set_name') or ''), str(int(str(d.get('number') or '0'))).zfill(3)) in names))
         cards = []
         seen = set()
         # True official Japanese AR rarity only.
