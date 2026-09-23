@@ -120,6 +120,7 @@ def main():
     try:
         clone_upstream(tmp)
         by_key, ar_records = load_records(tmp)
+        print('DEBUG English-name matches:', sum(1 for d in ar_records if (str(d.get('set_name') or ''), str(int(str(d.get('number') or '0'))).zfill(3)) in names))
         cards = []
         seen = set()
         # True official Japanese AR rarity only.
