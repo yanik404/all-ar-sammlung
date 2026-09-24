@@ -1,0 +1,10 @@
+/* Clear visual distinction for cards still missing from the collection. */
+.card.missing .card-visual img {
+  filter: grayscale(1) contrast(.78) brightness(.68);
+  opacity: .58;
+}
+
+.slot.missing img {
+  filter: grayscale(1) contrast(.78) brightness(.68);
+  opacity: .52;
+}
