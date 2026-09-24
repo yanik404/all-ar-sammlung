@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="All AR Sammlung">
+  <defs>
+    <linearGradient id="panel" x1="64" y1="48" x2="452" y2="476" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2c3829"/>
+      <stop offset="1" stop-color="#111610"/>
+    </linearGradient>
+    <linearGradient id="lime" x1="135" y1="134" x2="388" y2="373" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e8ff9d"/>
+      <stop offset="1" stop-color="#a6d95f"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#10140f"/>
+  <rect x="36" y="36" width="440" height="440" rx="88" fill="url(#panel)" stroke="#526248" stroke-width="10"/>
+  <path d="M144 347V184h47v37c18-29 43-43 75-43v53h-14c-38 0-61 22-61 68v48h-47Zm138 0V179h47v24c16-19 36-29 62-29 45 0 72 29 72 80v93h-47v-84c0-29-14-45-39-45-29 0-48 21-48 57v72h-47Z" fill="url(#lime)"/>
+  <path d="m382 109 10 25 27 10-27 10-10 27-10-27-27-10 27-10 10-25Z" fill="#f3ffd1"/>
+  <circle cx="115" cy="391" r="10" fill="#a6d95f" opacity=".8"/>
+</svg>
