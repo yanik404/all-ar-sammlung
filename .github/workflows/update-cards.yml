@@ -1,6 +1,11 @@
 name: Update verified AR data
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/**'
+      - 'data/art_rare_reference.json'
+      - '.github/workflows/update-cards.yml'
   schedule:
     - cron: '17 4 * * 1'
 permissions:
@@ -15,6 +20,7 @@ jobs:
           python-version: '3.12'
       - run: pip install beautifulsoup4
       - run: python scripts/build_cards.py
+      - run: python scripts/add_special_cards.py
       - name: Commit changed data
         run: |
           git config user.name "all-ar-bot"
