@@ -21,8 +21,8 @@ jobs:
       - run: pip install beautifulsoup4
       - run: python scripts/build_cards.py
       - run: python scripts/add_special_cards.py
-      - name: Inspect official M-P promo images
-        run: python scripts/discover_mpromo_images.py
+      - name: Use official M-P promo images
+        run: python scripts/fix_mpromo_images.py
       - name: Audit all card images
         run: python scripts/check_images.py
       - name: Commit changed data
