@@ -24,6 +24,50 @@ catch { notify('Deine gespeicherten Markierungen konnten nicht gelesen werden.')
 function notify(message) { $('notice').hidden = false; $('notice').textContent = message; }
 const owned = id => states[id] === 'owned';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function exportSave(){
+  const payload={
+    app:'all-ar-sammlung',
+    version:1,
+    exported_at:new Date().toISOString(),
+    card_count:cards.length,
+    states
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const day=new Date().toISOString().slice(0,10);
+  a.href=url; a.download='all-ar-save-'+day+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  notify('Save-Datei wurde exportiert. Bewahre sie gut auf.');
+}
+function importSaveFile(file){
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const parsed=JSON.parse(String(reader.result||''));
+      if(!parsed || parsed.app!=='all-ar-sammlung' || typeof parsed.states!=='object' || Array.isArray(parsed.states)) throw new Error('invalid-save');
+      const validIds=new Set(cards.map(c=>c.id));
+      const allowed=new Set(['owned','missing','unsure']);
+      const imported={};
+      for(const [id,status] of Object.entries(parsed.states)){
+        if(validIds.has(id) && allowed.has(status)) imported[id]=status;
+      }
+      if(!Object.keys(imported).length && Object.keys(parsed.states).length) throw new Error('no-matching-cards');
+      localStorage.setItem(KEY,JSON.stringify(imported));
+      states=imported;
+      renderCollection(); buildBinder(); if(selectedCard)updateZoomButton();
+      notify('Save geladen: '+Object.values(imported).filter(v=>v==='owned').length+' Karten als „Habe ich“ übernommen.');
+    }catch{
+      notify('Diese Datei ist keine gültige All-AR-Save-Datei.');
+    }finally{
+      $('saveFile').value='';
+    }
+  };
+  reader.onerror=()=>notify('Die Save-Datei konnte nicht gelesen werden.');
+  reader.readAsText(file);
+}
 function setState(id, state) {
   const next = {...states, [id]:state};
   try { localStorage.setItem(KEY, JSON.stringify(next)); states = next; }
@@ -120,6 +164,9 @@ $('jumpPromo').onclick=()=>{spread=1+Math.floor((PROMO_START-20)/40);renderBinde
 $('closeZoom').onclick=()=>$('zoomDialog').close();
 $('zoomDialog').addEventListener('click',e=>{if(e.target===$('zoomDialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close()}});
 $('zoomOwned').onclick=()=>setState(selectedCard.id,owned(selectedCard.id)?'missing':'owned');
+$('exportSave').onclick=exportSave;
+$('importSave').onclick=()=>$('saveFile').click();
+$('saveFile').addEventListener('change',e=>importSaveFile(e.target.files&&e.target.files[0]));
 $('installApp').onclick=async()=>{
   if(isStandalone()) return;
   if(deferredInstallPrompt){
