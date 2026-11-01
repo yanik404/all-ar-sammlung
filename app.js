@@ -3,6 +3,22 @@ const $ = id => document.getElementById(id);
 const KEY = 'all-ar-owned-v1', CAPACITY = 1280, PROMO_START = 1116;
 let cards = [], states = {}, filter = 'all', newest = false, spread = 0, selectedCard = null;
 let slots = Array(CAPACITY).fill(null);
+let deferredInstallPrompt = null;
+function isStandalone(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+function updateInstallButton(){
+  const btn=$('installApp'); if(!btn)return;
+  if(isStandalone()){ btn.hidden=true; return; }
+  btn.hidden=false;
+}
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault(); deferredInstallPrompt=e; updateInstallButton();
+});
+window.addEventListener('appinstalled', ()=>{
+  deferredInstallPrompt=null; updateInstallButton(); notify('All AR wurde installiert.');
+});
+
 try { const saved = JSON.parse(localStorage.getItem(KEY) || '{}'); if (saved && typeof saved === 'object' && !Array.isArray(saved)) states = saved; }
 catch { notify('Deine gespeicherten Markierungen konnten nicht gelesen werden.'); }
 function notify(message) { $('notice').hidden = false; $('notice').textContent = message; }
@@ -104,6 +120,20 @@ $('jumpPromo').onclick=()=>{spread=1+Math.floor((PROMO_START-20)/40);renderBinde
 $('closeZoom').onclick=()=>$('zoomDialog').close();
 $('zoomDialog').addEventListener('click',e=>{if(e.target===$('zoomDialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close()}});
 $('zoomOwned').onclick=()=>setState(selectedCard.id,owned(selectedCard.id)?'missing':'owned');
+$('installApp').onclick=async()=>{
+  if(isStandalone()) return;
+  if(deferredInstallPrompt){
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt=null;
+    updateInstallButton();
+    return;
+  }
+  const ua=navigator.userAgent||'';
+  if(/SamsungBrowser/i.test(ua)) notify('Samsung Internet: Menü ☰ → Seite hinzufügen zu → Startbildschirm.');
+  else notify('Chrome: Menü ⋮ → Zum Startbildschirm hinzufügen. Falls dort nur „Verknüpfung erstellen“ steht, Seite einmal neu laden und erneut öffnen.');
+};
+updateInstallButton();
 fetch('data/cards.json').then(r=>{if(!r.ok)throw Error(r.status);return r.json()}).then(d=>{
   cards=d.cards||[];renderCollection();buildBinder();
   const featured=cards.find(c=>c.name==='Mew')||cards[0];if(featured)$('heroImage').src=featured.image;
