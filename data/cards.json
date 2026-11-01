@@ -8299,9 +8299,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_101_aumftuat.png",
+      "image": "data/images/M-P-101.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000101
+      "jp_id": 1000101,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_101_aumftuat.webp"
     },
     {
       "id": "promo:M-P-102",
@@ -8313,9 +8314,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_102_pt9obsca.png",
+      "image": "data/images/M-P-102.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000102
+      "jp_id": 1000102,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_102_pt9obsca.webp"
     },
     {
       "id": "promo:M-P-103",
@@ -8327,9 +8329,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_103_4ewh05a9.png",
+      "image": "data/images/M-P-103.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000103
+      "jp_id": 1000103,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_103_4ewh05a9.webp"
     },
     {
       "id": "promo:M-P-104",
@@ -8341,9 +8344,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_104_0hjzlyap.png",
+      "image": "data/images/M-P-104.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000104
+      "jp_id": 1000104,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_104_0hjzlyap.webp"
     },
     {
       "id": "promo:M-P-105",
@@ -8355,9 +8359,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_105_d69y7lqp.png",
+      "image": "data/images/M-P-105.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000105
+      "jp_id": 1000105,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_105_d69y7lqp.webp"
     },
     {
       "id": "promo:M-P-106",
@@ -8369,9 +8374,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_106_cn01nfwy.png",
+      "image": "data/images/M-P-106.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000106
+      "jp_id": 1000106,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_106_cn01nfwy.webp"
     },
     {
       "id": "promo:M-P-107",
@@ -8383,9 +8389,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_107_fo9kbv0z.png",
+      "image": "data/images/M-P-107.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000107
+      "jp_id": 1000107,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_107_fo9kbv0z.webp"
     },
     {
       "id": "promo:M-P-108",
@@ -8397,9 +8404,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_108_w8uo5010.png",
+      "image": "data/images/M-P-108.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000108
+      "jp_id": 1000108,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_108_w8uo5010.webp"
     },
     {
       "id": "promo:M-P-109",
@@ -8411,9 +8419,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_109_tddzzzgs.png",
+      "image": "data/images/M-P-109.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000109
+      "jp_id": 1000109,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_109_tddzzzgs.webp"
     },
     {
       "id": "promo:M-P-110",
@@ -8425,9 +8434,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_110_8vcdtj1b.png",
+      "image": "data/images/M-P-110.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000110
+      "jp_id": 1000110,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_110_8vcdtj1b.webp"
     },
     {
       "id": "promo:M-P-111",
@@ -8439,9 +8449,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_111_k6lf6kih.png",
+      "image": "data/images/M-P-111.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000111
+      "jp_id": 1000111,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_111_k6lf6kih.webp"
     },
     {
       "id": "promo:M-P-112",
@@ -8453,9 +8464,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_112_omlkqn9k.png",
+      "image": "data/images/M-P-112.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000112
+      "jp_id": 1000112,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_112_omlkqn9k.webp"
     },
     {
       "id": "promo:M-P-113",
@@ -8467,9 +8479,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_113_hu6x7wmd.png",
+      "image": "data/images/M-P-113.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000113
+      "jp_id": 1000113,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_113_hu6x7wmd.webp"
     },
     {
       "id": "promo:M-P-114",
@@ -8481,9 +8494,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_114_n28qwgxs.png",
+      "image": "data/images/M-P-114.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000114
+      "jp_id": 1000114,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_114_n28qwgxs.webp"
     },
     {
       "id": "promo:M-P-115",
@@ -8495,9 +8509,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_115_mnrfal5b.png",
+      "image": "data/images/M-P-115.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000115
+      "jp_id": 1000115,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_115_mnrfal5b.webp"
     },
     {
       "id": "promo:M-P-116",
@@ -8509,9 +8524,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_116_ot4rv5w3.png",
+      "image": "data/images/M-P-116.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000116
+      "jp_id": 1000116,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_116_ot4rv5w3.webp"
     },
     {
       "id": "promo:M-P-117",
@@ -8523,9 +8539,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_117_4wk6z26d.png",
+      "image": "data/images/M-P-117.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000117
+      "jp_id": 1000117,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_117_4wk6z26d.webp"
     },
     {
       "id": "promo:M-P-118",
@@ -8537,9 +8554,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_118_s38jcptz.png",
+      "image": "data/images/M-P-118.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000118
+      "jp_id": 1000118,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_118_s38jcptz.webp"
     },
     {
       "id": "promo:M-P-119",
@@ -8551,9 +8569,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_119_7t38ep1y.png",
+      "image": "data/images/M-P-119.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000119
+      "jp_id": 1000119,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_119_7t38ep1y.webp"
     },
     {
       "id": "promo:M-P-120",
@@ -8565,9 +8584,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_120_f25bwe3z.png",
+      "image": "data/images/M-P-120.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000120
+      "jp_id": 1000120,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_120_f25bwe3z.webp"
     },
     {
       "id": "promo:M-P-121",
@@ -8579,9 +8599,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_121_4bs8bu09.png",
+      "image": "data/images/M-P-121.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000121
+      "jp_id": 1000121,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_121_4bs8bu09.webp"
     },
     {
       "id": "promo:M-P-122",
@@ -8593,9 +8614,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_122_k336sfa5.png",
+      "image": "data/images/M-P-122.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000122
+      "jp_id": 1000122,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_122_k336sfa5.webp"
     },
     {
       "id": "promo:M-P-123",
@@ -8607,9 +8629,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_123_m073z7hq.png",
+      "image": "data/images/M-P-123.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000123
+      "jp_id": 1000123,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_123_m073z7hq.webp"
     },
     {
       "id": "promo:M-P-124",
@@ -8621,9 +8644,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_124_nth0rgfs.png",
+      "image": "data/images/M-P-124.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000124
+      "jp_id": 1000124,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_124_nth0rgfs.webp"
     },
     {
       "id": "promo:M-P-125",
@@ -8635,9 +8659,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_125_b775ygf7.png",
+      "image": "data/images/M-P-125.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000125
+      "jp_id": 1000125,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_125_b775ygf7.webp"
     },
     {
       "id": "promo:M-P-126",
@@ -8649,9 +8674,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_126_i1s034lw.png",
+      "image": "data/images/M-P-126.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000126
+      "jp_id": 1000126,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_126_i1s034lw.webp"
     },
     {
       "id": "promo:M-P-127",
@@ -8663,9 +8689,10 @@
       "name_ja": "",
       "rarity": "AR Promo",
       "kind": "AR Promo",
-      "image": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_127_m6p8f3c0.png",
+      "image": "data/images/M-P-127.webp",
       "source_url": "https://www.30th.pokemon-card.com/product/cardset",
-      "jp_id": 1000127
+      "jp_id": 1000127,
+      "image_source_url": "https://www.30th.pokemon-card.com/images/cardset/cards/promo_127_m6p8f3c0.webp"
     }
   ]
 }
