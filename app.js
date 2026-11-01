@@ -181,7 +181,7 @@ $('installApp').onclick=async()=>{
   else notify('Chrome: Menü ⋮ → Zum Startbildschirm hinzufügen. Falls dort nur „Verknüpfung erstellen“ steht, Seite einmal neu laden und erneut öffnen.');
 };
 updateInstallButton();
-fetch('data/cards.json').then(r=>{if(!r.ok)throw Error(r.status);return r.json()}).then(d=>{
+fetch('data/cards.json?images=20', {cache:'no-store'}).then(r=>{if(!r.ok)throw Error(r.status);return r.json()}).then(d=>{
   cards=d.cards||[];renderCollection();buildBinder();
   const featured=cards.find(c=>c.name==='Mew')||cards[0];if(featured)$('heroImage').src=featured.image;
 }).catch(()=>notify('Die Kartendaten konnten nicht geladen werden. Bitte lade die App erneut.'));
