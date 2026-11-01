@@ -15,6 +15,8 @@ from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "data" / "cards.json"
+IMAGE_MANIFEST = ROOT / "data" / "recent_image_sources.json"
+BUNDLED_IMAGES = json.loads(IMAGE_MANIFEST.read_text(encoding="utf-8")) if IMAGE_MANIFEST.exists() else {}
 NAMES = [
     ("Alolan Exeggutor", "アローラナッシー"), ("Moltres", "ファイヤー"),
     ("Lapras", "ラプラス"), ("Articuno", "フリーザー"),
@@ -94,13 +96,16 @@ def main():
 def insert(by_key,upstream,code,num,name,ja,kind,display,set_name,official_id):
     d=upstream.get((code,num),{})
     old=by_key.get((code,num),{})
-    image=d.get("img") or old.get("image")
+    bundled=BUNDLED_IMAGES.get(f"{code}-{num:03d}", {})
+    image=bundled.get("image") or d.get("img") or old.get("image")
+    if bundled and not (ROOT / image).is_file():
+        raise RuntimeError(f"Bundled card image missing: {image}")
     if not image or image.startswith("data:"):
         image=placeholder(name,display)
         image_status="placeholder_pending_official_image"
     else:
         image_status=None
-    url=d.get("url") or old.get("source_url")
+    url=d.get("url") or old.get("source_url") or bundled.get("source_url")
     if official_id:
         url=f"https://www.pokemon-card.com/card-search/details.php/card/{official_id}"
     obj={**old,
@@ -111,6 +116,8 @@ def insert(by_key,upstream,code,num,name,ja,kind,display,set_name,official_id):
         "image":image,
         "source_url":url or "https://www.pokemon-card.com/card-search/",
         "jp_id":d.get("jp_id") or old.get("jp_id") or (800000+num)}
+    if bundled:
+        obj["image_source_url"]=bundled["image_source_url"]
     if image_status: obj["image_status"]=image_status
     else: obj.pop("image_status",None)
     by_key[(code,num)]=obj

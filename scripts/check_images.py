@@ -6,7 +6,8 @@ from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-DATA = Path(__file__).resolve().parents[1] / 'data' / 'cards.json'
+ROOT = Path(__file__).resolve().parents[1]
+DATA = ROOT / 'data' / 'cards.json'
 UA = 'Mozilla/5.0 (compatible; AllARCollectionImageAudit/1.0)'
 
 def check(card):
@@ -14,6 +15,15 @@ def check(card):
     if not url:
         return card, 'missing-url'
     try:
+        if not url.startswith(('https://', 'http://', 'data:')):
+            local = (ROOT / url).resolve()
+            if not local.is_relative_to(ROOT.resolve()):
+                return card, 'invalid-local-path'
+            header = local.read_bytes()[:12]
+            valid = (header.startswith(b'\xff\xd8\xff')
+                     or header.startswith(b'\x89PNG\r\n\x1a\n')
+                     or (header.startswith(b'RIFF') and header[8:12] == b'WEBP'))
+            return card, None if valid else 'invalid-local-image'
         req = Request(url, headers={'User-Agent': UA, 'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'})
         with urlopen(req, timeout=20) as r:
             status = getattr(r, 'status', 200)
