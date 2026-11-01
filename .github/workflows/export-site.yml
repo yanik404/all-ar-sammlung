@@ -1,0 +1,27 @@
+name: Export latest website
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/export-site.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build website package
+        run: |
+          mkdir -p export/data export/icons
+          cp index.html app.js styles.css missing-state.css manifest.webmanifest sw.js export/
+          cp data/cards.json export/data/
+          cp icons/icon-192.png icons/icon-512.png export/icons/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: all-ar-webseite-aktuell
+          path: export/
+          if-no-files-found: error
