@@ -74,11 +74,20 @@ function setState(id, state) {
   catch { notify('Die Markierung konnte auf diesem Gerät nicht gespeichert werden.'); return; }
   renderCollection(); renderBinder(); if (selectedCard) updateZoomButton();
 }
+function matchesNumberQuery(numberDisplay, query) {
+  // Kartennummern auch ohne führende Nullen und mit Leerzeichen statt "/" finden.
+  const input = query.match(/^(\d+)\s*(?:\/|\s+)\s*(\d+)$/);
+  const stored = String(numberDisplay ?? '').match(/^(\d+)\s*\/\s*(\d+)$/);
+  return Boolean(input && stored &&
+    Number(input[1]) === Number(stored[1]) &&
+    Number(input[2]) === Number(stored[2]));
+}
 function filteredCards() {
   const query = $('q').value.trim().toLowerCase();
   const result = cards.filter(c => {
     if (filter === 'owned' && !owned(c.id) || filter === 'missing' && owned(c.id) || filter === 'promo' && c.kind !== 'AR Promo') return false;
-    return !query || [c.name,c.name_ja,c.set_name,c.set_code,c.number_display].join(' ').toLowerCase().includes(query);
+    return !query || [c.name,c.name_ja,c.set_name,c.set_code,c.number_display].join(' ').toLowerCase().includes(query) ||
+      matchesNumberQuery(c.number_display, query);
   });
   return newest ? result.reverse() : result;
 }
