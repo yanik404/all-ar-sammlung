@@ -64,6 +64,64 @@ RAGING_SURF_FALLBACK = {
     '074': ('Cyclizar', 'モトトカゲ'),
 }
 
+# Independently checked numbering of all released Japanese AR sets.
+# If an upstream feed omits an entire set, stop the build instead of
+# publishing an incomplete binder. New sets should be added to this baseline.
+REQUIRED_AR_RANGES = {
+    'S12a': (173, 209),
+    'SV1S': (79, 90), 'SV1V': (79, 90), 'SV1a': (74, 85),
+    'SV2P': (72, 83), 'SV2D': (72, 83), 'SV2a': (166, 183),
+    'SV3': (109, 120), 'SV3a': (63, 74),
+    'SV4K': (67, 78), 'SV4M': (67, 78), 'SV4a': (338, 341),
+    'SV5K': (72, 83), 'SV5M': (72, 83), 'SV5a': (67, 78),
+    'SV6': (102, 113), 'SV6a': (65, 76), 'SV7': (103, 114),
+    'SV7a': (65, 76), 'SV8': (107, 118),
+    # SV8a / Terastal Festival ex has 0 AR cards.
+    'SV9': (101, 112), 'SV9a': (64, 75), 'SV10': (99, 110),
+    'SV11B': (87, 158), 'SV11W': (87, 158),
+    'M1L': (64, 75), 'M1S': (64, 75), 'M2': (81, 92),
+    'M2a': (194, 213), 'M3': (81, 92), 'M4': (84, 95),
+    'M5': (82, 93), 'M6': (77, 88), 'M6a': (104, 123),
+}
+REQUIRED_PROMO_NUMBERS = {
+    'M-P': list(range(101, 128)),
+    'MC': list(range(743, 757)),
+    'SVG': [50, 51, 52],
+    'SV-P': [1, 48, 49, 98, 148, 192, 193, 218, 232],
+    'SVOM': [20], 'SVOD': [19], 'MBG': [22], 'MBD': [22],
+    'MEE': [20], 'MEZ': [20], 'MEM': [18], 'MF': [41, 42],
+}
+
+def validate_known_collection(cards):
+    seen = set()
+    for card in cards:
+        set_code = str(card.get('set_code') or '')
+        number = str(card.get('number') or '')
+        card_key = (set_code, number.lstrip('0') or '0')
+        if card_key in seen:
+            raise RuntimeError(f'Duplicate card number for the same set: {card_key}')
+        seen.add(card_key)
+        if not card.get('image') or not card.get('name') or not card.get('id'):
+            raise RuntimeError(f'Incomplete card record: {card_key}')
+    by_kind = {
+        kind: {(str(c['set_code']), int(c['number'])) for c in cards
+               if c['kind'] == kind and str(c['number']).isdigit()}
+        for kind in ('AR', 'AR Promo')
+    }
+    errors = []
+    for set_code, (first, last) in REQUIRED_AR_RANGES.items():
+        missing = [str(n).zfill(3) for n in range(first, last + 1)
+                   if (set_code, n) not in by_kind['AR']]
+        if missing:
+            errors.append(f'{set_code}: missing AR cards {", ".join(missing)}')
+    for set_code, numbers in REQUIRED_PROMO_NUMBERS.items():
+        missing = [str(n).zfill(3) for n in numbers
+                   if (set_code, n) not in by_kind['AR Promo']]
+        if missing:
+            errors.append(f'{set_code}: missing AR promo cards {", ".join(missing)}')
+    if errors:
+        raise RuntimeError('Incomplete verified AR checklist:\\n' + '\\n'.join(errors))
+
 def norm(s):
     return re.sub(r'\s+',' ',s.replace('\xa0',' ')).strip()
 
@@ -220,8 +278,8 @@ def main():
                 'rarity': 'AR',
                 'kind': 'AR',
                 'image': f'https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SV3a/SV3a_{n}_R_JP.png',
-                'source_url': f'https://limitlesstcg.com/cards/jp/SV3a/{n}',
-                'jp_id': 0,
+                'source_url': f'https://www.pokemon-card.com/card-search/details.php/card/{44379 + n - 63}',
+                'jp_id': 44379 + (n - 63),
             })
         # Registration order for normal cards / promo dates.
         cards.sort(key=lambda c: (c['kind'] == 'AR Promo', int(c.get('jp_id') or 0), c['set_code'], int(c['number']) if str(c['number']).isdigit() else 9999))
@@ -232,6 +290,7 @@ def main():
             before_sv4 = next((i for i, c in enumerate(cards)
                                if c['kind'] == 'AR' and c['set_code'] in ('SV4K', 'SV4M')), len(cards))
             cards[before_sv4:before_sv4] = sorted(surf, key=lambda c: int(c['number']))
+        validate_known_collection(cards)
         # Safety check: an upstream parsing problem must never silently erase
         # previously verified cards (including whole sets or promo groups).
         if OUT.exists():
