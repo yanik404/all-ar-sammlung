@@ -232,6 +232,24 @@ def main():
             before_sv4 = next((i for i, c in enumerate(cards)
                                if c['kind'] == 'AR' and c['set_code'] in ('SV4K', 'SV4M')), len(cards))
             cards[before_sv4:before_sv4] = sorted(surf, key=lambda c: int(c['number']))
+        # Safety check: an upstream parsing problem must never silently erase
+        # previously verified cards (including whole sets or promo groups).
+        if OUT.exists():
+            previous = json.loads(OUT.read_text(encoding='utf-8'))
+            old_cards = {c['id']: c for c in previous.get('cards', [])}
+            new_cards = {c['id']: c for c in cards}
+            vanished = sorted(set(old_cards) - set(new_cards))
+            changed_kind = sorted(
+                card_id for card_id in old_cards.keys() & new_cards.keys()
+                if old_cards[card_id].get('kind') != new_cards[card_id].get('kind')
+            )
+            if vanished or changed_kind:
+                raise RuntimeError(
+                    'Card data check failed; refusing to overwrite verified collection. '
+                    f'Missing cards: {vanished[:20]} (total {len(vanished)}). '
+                    f'Changed rarity category: {changed_kind[:20]} '
+                    f'(total {len(changed_kind)}).'
+                )
         OUT.parent.mkdir(parents=True, exist_ok=True)
         OUT.write_text(json.dumps({'generated_from': {'official_jp':'type-null/PTCG-database (pokemon-card.com)','art_rare_reference':BULBA_URL}, 'count': len(cards), 'cards': cards}, ensure_ascii=False, indent=2), encoding='utf-8')
         print(f'Wrote {len(cards)} verified AR/AR-promo cards -> {OUT}')
