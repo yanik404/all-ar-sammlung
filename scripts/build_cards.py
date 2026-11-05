@@ -47,6 +47,23 @@ SET_MAP = {
     'SV-P Promotional cards':'SV-P','M-P Promotional cards':'M-P',
 }
 
+# Raging Surf SV3a AR cards 063/062–074/062, confirmed by Limitless.
+# The upstream rarity feed currently omits these; keep a verified fallback.
+RAGING_SURF_FALLBACK = {
+    '063': ('Snorunt', 'ユキワラシ'),
+    '064': ('Mantyke', 'タマンタ'),
+    '065': ('Plusle', 'プラスル'),
+    '066': ('Minun', 'マイナン'),
+    '067': ('Joltik', 'バチュル'),
+    '068': ('Gimmighoul', 'コレクレー'),
+    '069': ('Groudon', 'グラードン'),
+    '070': ('Minior', 'メテノ'),
+    '071': ('Yveltal', 'イベルタル'),
+    '072': ('Ferrothorn', 'ナットレイ'),
+    '073': ('Aegislash', 'ギルガルド'),
+    '074': ('Cyclizar', 'モトトカゲ'),
+}
+
 def norm(s):
     return re.sub(r'\s+',' ',s.replace('\xa0',' ')).strip()
 
@@ -182,8 +199,39 @@ def main():
             obj = card_obj(d, names.get(key), 'AR Promo', source_meta.get(key, {}))
             if obj['id'] not in seen:
                 cards.append(obj); seen.add(obj['id'])
-        # Registration order is a reliable fallback until exact per-card promo dates are enriched.
+        # Fallback only for the 12 independently verified Raging Surf ARs
+        # missing from the upstream rarity feed (not for arbitrary card numbers).
+        existing_raging_numbers = {
+            str(int(c['number'])) for c in cards
+            if c['set_code'] == 'SV3a' and c['kind'] == 'AR'
+        }
+        for number, (name_en, name_ja) in RAGING_SURF_FALLBACK.items():
+            if str(int(number)) in existing_raging_numbers:
+                continue
+            n = int(number)
+            cards.append({
+                'id': f'asia:SV3a-{n}',
+                'set_code': 'SV3a',
+                'set_name': 'Raging Surf',
+                'number': str(n),
+                'number_display': f'{number}/062',
+                'name': names.get(('SV3a', number), name_en),
+                'name_ja': name_ja,
+                'rarity': 'AR',
+                'kind': 'AR',
+                'image': f'https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SV3a/SV3a_{n}_R_JP.png',
+                'source_url': f'https://limitlesstcg.com/cards/jp/SV3a/{n}',
+                'jp_id': 0,
+            })
+        # Registration order for normal cards / promo dates.
         cards.sort(key=lambda c: (c['kind'] == 'AR Promo', int(c.get('jp_id') or 0), c['set_code'], int(c['number']) if str(c['number']).isdigit() else 9999))
+        # Fallback entries have no official JP ID: keep SV3a between SV3 and SV4.
+        surf = [c for c in cards if c['kind'] == 'AR' and c['set_code'] == 'SV3a']
+        if surf:
+            cards = [c for c in cards if not (c['kind'] == 'AR' and c['set_code'] == 'SV3a')]
+            before_sv4 = next((i for i, c in enumerate(cards)
+                               if c['kind'] == 'AR' and c['set_code'] in ('SV4K', 'SV4M')), len(cards))
+            cards[before_sv4:before_sv4] = sorted(surf, key=lambda c: int(c['number']))
         OUT.parent.mkdir(parents=True, exist_ok=True)
         OUT.write_text(json.dumps({'generated_from': {'official_jp':'type-null/PTCG-database (pokemon-card.com)','art_rare_reference':BULBA_URL}, 'count': len(cards), 'cards': cards}, ensure_ascii=False, indent=2), encoding='utf-8')
         print(f'Wrote {len(cards)} verified AR/AR-promo cards -> {OUT}')
