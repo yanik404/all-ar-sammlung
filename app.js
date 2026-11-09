@@ -166,7 +166,7 @@ function locateSelectedCard() {
   requestAnimationFrame(() => {
     const target = $('binderPages').querySelector('[data-slot-index="'+position+'"]');
     if (target) target.scrollIntoView({
-      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
       block: 'center',
       inline: 'nearest'
     });
