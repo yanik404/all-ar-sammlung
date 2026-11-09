@@ -3,6 +3,7 @@ const $ = id => document.getElementById(id);
 const KEY = 'all-ar-owned-v1', CAPACITY = 1280, PROMO_START = 1116;
 let cards = [], states = {}, filter = 'all', newest = false, spread = 0, selectedCard = null;
 let slots = Array(CAPACITY).fill(null);
+let highlightedSlot = -1;
 let deferredInstallPrompt = null;
 function isStandalone(){
   return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -127,13 +128,16 @@ function page(start) {
   return '<div class="binder-page">'+Array.from({length:Math.min(20,CAPACITY-start)},(_,i)=>{
     const n=start+i,c=slots[n],reserved=n>=PROMO_START;
     if(!c) return `<div class="slot empty ${reserved?'reserved':''}" title="Platz ${n+1} · ${reserved?'Promo-Reserve':'AR-Reserve'}">${n+1}</div>`;
-    return `<button class="slot ${owned(c.id)?'owned':'missing'} ${reserved?'reserved':''}" data-zoom="${esc(c.id)}" aria-label="Platz ${n+1}: ${esc(c.name)} vergrößern"><img loading="lazy" src="${esc(c.image)}" alt="${esc(c.name)}"><span class="slot-n">${n+1}</span></button>`;
+    return `<button class="slot ${owned(c.id)?'owned':'missing'} ${reserved?'reserved':''} ${n===highlightedSlot?'is-located':''}" data-zoom="${esc(c.id)}" data-slot-index="${n}" aria-label="Platz ${n+1}: ${esc(c.name)} vergrößern"><img loading="lazy" src="${esc(c.image)}" alt="${esc(c.name)}"><span class="slot-n">${n+1}</span></button>`;
   }).join('')+'</div>';
 }
 function renderBinder() {
   const start=spreadStart(spread),end=spread===0?20:Math.min(start+40,CAPACITY);
   $('spreadTitle').textContent = spread===0?'Die erste Seite':spread===LAST_SPREAD?'Die letzte Seite':start>=PROMO_START?'Deine AR-Promos':end>PROMO_START?'Hier beginnen die Promos':'Deine Art Rares';
-  $('spreadRange').textContent = 'Plätze '+(start+1)+'–'+end;
+  const locationVisible = highlightedSlot >= start && highlightedSlot < end;
+  $('spreadRange').textContent = locationVisible
+    ? 'Seite '+(Math.floor(highlightedSlot/20)+1)+' · Reihe '+(Math.floor((highlightedSlot%20)/5)+1)+' · Spalte '+(highlightedSlot%5+1)+' · Platz '+(highlightedSlot+1)
+    : 'Plätze '+(start+1)+'–'+end;
   $('binderPages').innerHTML = spread===0?'<div class="binder-blank" aria-hidden="true">ALL AR</div>'+page(0):page(start)+page(start+20);
   $('pageInfo').textContent=(spread+1)+' / '+(LAST_SPREAD+1);
   $('pageSelect').value=String(spread); $('prevPage').disabled=spread===0; $('nextPage').disabled=spread===LAST_SPREAD;
@@ -147,9 +151,31 @@ function show(view) {
   if(isBinder)renderBinder();
 }
 function updateZoomButton(){ $('zoomOwned').textContent=owned(selectedCard.id)?'✓ Habe ich · als fehlend markieren':'+ Zu meiner Sammlung hinzufügen'; }
+function locateSelectedCard() {
+  if (!selectedCard) return;
+  const position = slots.findIndex(c => c && c.id === selectedCard.id);
+  if (position < 0) {
+    $('zoomDialog').close();
+    notify('Diese Karte hat aktuell keinen Platz im Binder.');
+    return;
+  }
+  highlightedSlot = position;
+  spread = position < 20 ? 0 : 1 + Math.floor((position - 20) / 40);
+  $('zoomDialog').close();
+  show('binder');
+  requestAnimationFrame(() => {
+    const target = $('binderPages').querySelector('[data-slot-index="'+position+'"]');
+    if (target) target.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+      block: 'center',
+      inline: 'nearest'
+    });
+  });
+}
 function zoom(id) {
   selectedCard=cards.find(c=>c.id===id); if(!selectedCard)return;
   $('zoomImage').src=selectedCard.image; $('zoomImage').alt=selectedCard.name;
+  $('zoomImage').setAttribute('aria-label', selectedCard.name+' im Binder finden');
   $('zoomName').textContent=selectedCard.name; $('zoomMeta').textContent=selectedCard.set_code+' · '+selectedCard.number_display;
   updateZoomButton(); $('zoomDialog').showModal();
 }
@@ -159,6 +185,10 @@ $('cards').addEventListener('click',e=>{
   else if(zoomButton)zoom(zoomButton.dataset.zoom);
 });
 $('binderPages').addEventListener('click',e=>{const b=e.target.closest('[data-zoom]');if(b)zoom(b.dataset.zoom)});
+$('zoomImage').addEventListener('click', locateSelectedCard);
+$('zoomImage').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); locateSelectedCard(); }
+});
 document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{
   filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',String(x===b))});renderCollection();
 }));
