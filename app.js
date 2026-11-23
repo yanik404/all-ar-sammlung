@@ -4,6 +4,8 @@ const KEY = 'all-ar-owned-v1', CAPACITY = 1280, PROMO_START = 1116;
 let cards = [], states = {}, filter = 'all', newest = false, spread = 0, selectedCard = null;
 let slots = Array(CAPACITY).fill(null);
 let highlightedSlot = -1;
+const PAGE_SIZE = 64;
+let visibleCount = PAGE_SIZE, currentResults = [];
 let deferredInstallPrompt = null;
 function isStandalone(){
   return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -98,9 +100,22 @@ function tile(c) {
   <button class="card-visual" data-zoom="${esc(c.id)}" aria-label="${esc(c.name)} vergrößern"><img loading="lazy" decoding="async" src="${esc(c.image)}" alt="${esc(c.name)}"><span class="badge ${c.kind==='AR Promo'?'promo':''}">${c.kind==='AR Promo'?'PROMO':'AR'}</span>${has?'<span class="owned-check" aria-hidden="true">✓</span>':''}</button>
   <div class="card-info"><div class="card-kicker"><span>${esc(c.set_code)}</span><span>${esc(c.number_display)}</span></div><h3>${esc(c.name)}</h3><p class="card-set" title="${esc(c.set_name)}">${esc(c.set_name)}</p><div class="actions"><button data-state="owned" class="${has?'selected':''}" aria-pressed="${has}">✓ Habe ich</button><button data-state="missing" class="${!has?'selected':''}" aria-pressed="${!has}">Fehlt</button></div></div></article>`;
 }
-function renderCollection() {
+function loadMoreCards() {
+  if (visibleCount >= currentResults.length) return;
+  const start = visibleCount;
+  visibleCount = Math.min(currentResults.length, visibleCount + PAGE_SIZE);
+  $('cards').insertAdjacentHTML('beforeend', currentResults.slice(start, visibleCount).map(tile).join(''));
+  $('loadMore').hidden = visibleCount >= currentResults.length;
+  $('loadMore').textContent = 'Weitere Karten anzeigen (' + (currentResults.length - visibleCount) + ')';
+}
+function renderCollection(resetPage = false) {
   const list = filteredCards(), count = cards.filter(c => owned(c.id)).length;
-  $('cards').innerHTML = list.map(tile).join('');
+  currentResults = list;
+  if (resetPage) visibleCount = PAGE_SIZE;
+  visibleCount = Math.min(Math.max(visibleCount, PAGE_SIZE), list.length);
+  $('cards').innerHTML = list.slice(0, visibleCount).map(tile).join('');
+  $('loadMore').hidden = visibleCount >= list.length;
+  $('loadMore').textContent = 'Weitere Karten anzeigen (' + (list.length - visibleCount) + ')';
   $('emptyResults').hidden = list.length !== 0;
   $('resultCount').textContent = list.length + ' Karten';
   $('allN').textContent = cards.length; $('ownedN').textContent = count; $('missN').textContent = cards.length-count;
@@ -190,10 +205,18 @@ $('zoomImage').addEventListener('keydown', e => {
   if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); locateSelectedCard(); }
 });
 document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{
-  filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',String(x===b))});renderCollection();
+  filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',String(x===b))});renderCollection(true);
 }));
-$('q').addEventListener('input',renderCollection);
-$('order').onclick=()=>{newest=!newest;$('order').textContent=newest?'↓ Neueste zuerst':'↑ Älteste zuerst';renderCollection()};
+$('q').addEventListener('input', () => renderCollection(true));
+$('q').addEventListener('search', () => renderCollection(true));
+$('loadMore').addEventListener('click', loadMoreCards);
+if ('IntersectionObserver' in window) {
+  const moreObserver = new IntersectionObserver(entries => {
+    if (entries.some(entry => entry.isIntersecting) && !$('collectionView').hidden) loadMoreCards();
+  }, {rootMargin:'700px 0px'});
+  moreObserver.observe($('loadMore'));
+}
+$('order').onclick=()=>{newest=!newest;$('order').textContent=newest?'↓ Neueste zuerst':'↑ Älteste zuerst';renderCollection(true)};
 $('navCollection').onclick=()=>show('collection');$('navBinder').onclick=()=>show('binder');
 $('prevPage').onclick=()=>{spread=Math.max(0,spread-1);renderBinder()};
 $('nextPage').onclick=()=>{spread=Math.min(LAST_SPREAD,spread+1);renderBinder()};
@@ -224,4 +247,14 @@ fetch('data/cards.json?images=20', {cache:'no-store'}).then(r=>{if(!r.ok)throw E
   cards=d.cards||[];renderCollection();buildBinder();
   const featured=cards.find(c=>c.name==='Mew')||cards[0];if(featured)$('heroImage').src=featured.image;
 }).catch(()=>notify('Die Kartendaten konnten nicht geladen werden. Bitte lade die App erneut.'));
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+if ('serviceWorker' in navigator) {
+  let reloadingForUpdate = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (reloadingForUpdate) return;
+    reloadingForUpdate = true;
+    window.location.reload();
+  });
+  navigator.serviceWorker.register('sw.js', {updateViaCache:'none'})
+    .then(registration => registration.update())
+    .catch(() => {});
+}
